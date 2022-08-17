@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupFirstScreen()
+        setupXmlBasedSetProgressBarExample()
     }
 
     private fun toggleExample(view: View) {
@@ -50,6 +51,12 @@ class MainActivity : AppCompatActivity() {
 
         buttonDeactivate.setOnClickListener {
             imageViewProfile.setActive(false)
+        }
+    }
+
+    private fun setupXmlBasedSetProgressBarExample(){
+        with(binding.contentXmlBasedStepProgressBar) {
+            buttonAction.setOnClickListener { root.transitionToEnd() }
         }
     }
 
