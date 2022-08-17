@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="MotionLayoutActiveImage">
+    <declare-styleable name="ActivableImage">
         <attr name="android:src" />
         <attr name="android:state_active" />
+        <attr name="duration" format="integer" />
         <attr name="active_tint" format="reference|color" />
         <attr name="inactive_tint" format="reference|color" />
     </declare-styleable>

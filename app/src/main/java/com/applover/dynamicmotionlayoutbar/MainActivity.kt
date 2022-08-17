@@ -21,5 +21,17 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+
+        setupFirstScreen()
+    }
+
+    private fun setupFirstScreen() = with(binding.layout) {
+        buttonActivate.setOnClickListener {
+            imageViewProfile.setActive(true)
+        }
+
+        buttonDeactivate.setOnClickListener {
+            imageViewProfile.setActive(false)
+        }
     }
 }

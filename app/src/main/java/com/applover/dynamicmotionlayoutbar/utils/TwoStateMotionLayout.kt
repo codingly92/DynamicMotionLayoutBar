@@ -14,6 +14,8 @@ abstract class TwoStateMotionLayout(
     defStyleAttr: Int = 0,
 ) : MotionLayout(context, attrs, defStyleAttr) {
 
+    protected var animationDuration = DEFAULT_ANIMATION_SPEED
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         val constraintSets = createViewsAndConstraintSets(this)
@@ -22,6 +24,7 @@ abstract class TwoStateMotionLayout(
         scene.addTransition(updatedTransition)
         setScene(scene)
         setTransition(updatedTransition)
+        setTransitionDuration(animationDuration)
     }
 
     abstract fun createViewsAndConstraintSets(layout: ConstraintLayout): Pair<ConstraintSet, ConstraintSet>
@@ -30,7 +33,13 @@ abstract class TwoStateMotionLayout(
         TransitionBuilder.buildTransition(
             scene,
             generateViewId(),
-            generateViewId(), sets.first,
-            generateViewId(), sets.second
+            generateViewId(),
+            sets.first,
+            generateViewId(),
+            sets.second,
         )
+
+    companion object {
+        private const val DEFAULT_ANIMATION_SPEED = 500
+    }
 }

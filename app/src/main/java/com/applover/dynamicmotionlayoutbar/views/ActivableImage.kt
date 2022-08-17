@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.getColorOrThrow
+import androidx.core.content.res.getIntOrThrow
 import androidx.core.content.res.getResourceIdOrThrow
 import com.applover.dynamicmotionlayoutbar.R
 import com.applover.dynamicmotionlayoutbar.utils.TwoStateMotionLayout
@@ -26,13 +27,15 @@ class ActivableImage @JvmOverloads constructor(
     init {
         context.theme.obtainStyledAttributes(
             attrs,
-            R.styleable.MotionLayoutActiveImage,
-            0, 0
+            R.styleable.ActivableImage,
+            0,
+            0,
         ).apply {
             try {
-                drawableRes = getResourceIdOrThrow(R.styleable.MotionLayoutActiveImage_android_src)
-                activeTint = getColorOrThrow(R.styleable.MotionLayoutActiveImage_active_tint)
-                inactiveTint = getColorOrThrow(R.styleable.MotionLayoutActiveImage_inactive_tint)
+                drawableRes = getResourceIdOrThrow(R.styleable.ActivableImage_android_src)
+                activeTint = getColorOrThrow(R.styleable.ActivableImage_active_tint)
+                inactiveTint = getColorOrThrow(R.styleable.ActivableImage_inactive_tint)
+                animationDuration = getIntOrThrow(R.styleable.ActivableImage_duration)
             } finally {
                 recycle()
             }
@@ -44,7 +47,7 @@ class ActivableImage @JvmOverloads constructor(
         val imageView = ImageView(layout.context)
         val imageViewId = generateViewId()
         imageView.id = imageViewId
-        val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, LayoutParams.MATCH_CONSTRAINT)
         imageView.setImageResource(drawableRes)
         layout.addView(imageView, layoutParams)
         set.clone(layout)
@@ -53,12 +56,14 @@ class ActivableImage @JvmOverloads constructor(
         val startSet = createSet {
             setColorValue(imageViewId, "ColorFilter", inactiveTint)
             setAlpha(imageViewId, 0.3f)
+            centerInParent(imageViewId)
         }
 
         val endSet = createSet {
             setColorValue(imageViewId, "ColorFilter", activeTint)
             setAlpha(imageViewId, 1f)
             applyTo(this@ActivableImage)
+            centerInParent(imageViewId)
         }
 
         return startSet to endSet
