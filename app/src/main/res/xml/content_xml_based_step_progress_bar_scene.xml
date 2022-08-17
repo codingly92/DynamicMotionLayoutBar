@@ -6,7 +6,7 @@
         android:id="@+id/transition_next"
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
-        motion:duration="1000"/>
+        motion:duration="@integer/animation_medium"/>
 
     <ConstraintSet android:id="@+id/start" />
 
