@@ -6,5 +6,6 @@
         <attr name="duration" format="integer" />
         <attr name="active_tint" format="reference|color" />
         <attr name="inactive_tint" format="reference|color" />
+        <attr name="is_active" format="boolean" />
     </declare-styleable>
 </resources>

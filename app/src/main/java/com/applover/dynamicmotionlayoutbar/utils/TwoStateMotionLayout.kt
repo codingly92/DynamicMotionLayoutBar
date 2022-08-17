@@ -15,6 +15,7 @@ abstract class TwoStateMotionLayout(
 ) : MotionLayout(context, attrs, defStyleAttr) {
 
     protected var animationDuration = DEFAULT_ANIMATION_SPEED
+    protected var startAtTheEndTransition = false
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -25,6 +26,9 @@ abstract class TwoStateMotionLayout(
         setScene(scene)
         setTransition(updatedTransition)
         setTransitionDuration(animationDuration)
+        if(startAtTheEndTransition){
+            progress = 1f
+        }
     }
 
     abstract fun createViewsAndConstraintSets(layout: ConstraintLayout): Pair<ConstraintSet, ConstraintSet>

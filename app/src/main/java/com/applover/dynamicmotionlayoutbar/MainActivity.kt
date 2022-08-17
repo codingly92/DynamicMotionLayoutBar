@@ -3,8 +3,11 @@ package com.applover.dynamicmotionlayoutbar
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.isVisible
 import com.applover.dynamicmotionlayoutbar.databinding.ActivityMainBinding
+import com.applover.dynamicmotionlayoutbar.utils.isEndState
+import com.applover.dynamicmotionlayoutbar.utils.isStartState
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
@@ -54,9 +57,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupXmlBasedSetProgressBarExample(){
+    private fun setupXmlBasedSetProgressBarExample() {
         with(binding.contentXmlBasedStepProgressBar) {
-            buttonAction.setOnClickListener { root.transitionToEnd() }
+            root.setTransitionListener(object : MotionLayout.TransitionListener {
+                override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
+                    val isEndState = root.isEndState()
+                    buttonAction.text = if (root.isEndState()) {
+                        "Previous"
+                    } else {
+                        "Next"
+                    }
+                    imageViewStart.setActive(!isEndState)
+                    imageViewEnd.setActive(isEndState)
+                }
+
+                override fun onTransitionChange(motionLayout: MotionLayout?, startId: Int, endId: Int, progress: Float) {
+                    // ignore
+                }
+
+                override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+                    // ignore
+                }
+
+                override fun onTransitionTrigger(motionLayout: MotionLayout?, triggerId: Int, positive: Boolean, progress: Float) {
+                    // ignore
+                }
+
+            })
+            buttonAction.setOnClickListener {
+                root.apply {
+                    if (isStartState()) {
+                        transitionToEnd()
+                    } else {
+                        transitionToStart()
+                    }
+                }
+            }
         }
     }
 

@@ -14,6 +14,7 @@
         app:active_tint="@color/active"
         app:duration="@integer/animation_medium"
         app:inactive_tint="@color/inactive"
+        app:is_active="true"
         app:layout_constraintEnd_toStartOf="@+id/imageViewEnd"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,10 +74,10 @@
 
     <Button
         android:id="@+id/buttonAction"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Next step"
+        android:text="Next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

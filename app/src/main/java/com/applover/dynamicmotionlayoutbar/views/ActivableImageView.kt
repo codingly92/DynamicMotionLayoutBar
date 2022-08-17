@@ -36,6 +36,7 @@ class ActivableImageView @JvmOverloads constructor(
                 activeTint = getColorOrThrow(R.styleable.ActivableImageView_active_tint)
                 inactiveTint = getColorOrThrow(R.styleable.ActivableImageView_inactive_tint)
                 animationDuration = getIntOrThrow(R.styleable.ActivableImageView_duration)
+                startAtTheEndTransition = getBoolean(R.styleable.ActivableImageView_is_active, false)
             } finally {
                 recycle()
             }

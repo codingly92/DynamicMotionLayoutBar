@@ -1,5 +1,6 @@
 package com.applover.dynamicmotionlayoutbar.utils
 
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 
@@ -16,3 +17,7 @@ fun ConstraintSet.centerInParent(viewId: Int){
     connect(viewId, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
     connect(viewId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
 }
+
+fun MotionLayout.isStartState() = currentState == startState
+
+fun MotionLayout.isEndState() = currentState == endState
