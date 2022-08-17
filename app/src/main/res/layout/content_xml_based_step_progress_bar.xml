@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.applover.dynamicmotionlayoutbar.views.ActivableImageView
+        android:id="@+id/imageViewStart"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add_shopping_cart_48px"
+        app:active_tint="@color/active"
+        app:duration="@integer/animation_medium"
+        app:inactive_tint="@color/inactive"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewEnd"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.applover.dynamicmotionlayoutbar.views.ActivableImageView
+        android:id="@+id/imageViewEnd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_payments_48px"
+        app:active_tint="@color/active"
+        app:duration="@integer/animation_medium"
+        app:inactive_tint="@color/inactive"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imageViewStart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Space
+        android:id="@+id/anchorStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="@id/imageViewStart"
+        app:layout_constraintStart_toStartOf="@id/imageViewStart"
+        app:layout_constraintTop_toBottomOf="@id/imageViewStart" />
+
+    <Space
+        android:id="@+id/anchorEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="@id/imageViewEnd"
+        app:layout_constraintStart_toStartOf="@id/imageViewEnd"
+        app:layout_constraintTop_toBottomOf="@id/imageViewEnd" />
+
+    <ImageView
+        android:id="@+id/inactiveBar"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:src="@drawable/bar"
+        app:layout_constraintEnd_toEndOf="@id/anchorEnd"
+        app:layout_constraintStart_toStartOf="@id/anchorStart"
+        app:layout_constraintTop_toTopOf="@id/anchorStart"
+        app:tint="@color/inactive" />
+
+    <ImageView
+        android:id="@+id/activeBar"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:src="@drawable/bar"
+        app:layout_constraintBottom_toBottomOf="@id/inactiveBar"
+        app:layout_constraintStart_toStartOf="@id/anchorStart"
+        app:layout_constraintTop_toTopOf="@id/inactiveBar"
+        app:tint="@color/active" />
+
+    <Button
+        android:id="@+id/buttonAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Next step"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activeBar" />
+</androidx.constraintlayout.widget.ConstraintLayout>

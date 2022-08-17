@@ -22,11 +22,19 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <include
-        android:id="@+id/layout"
-        layout="@layout/content_main"
+        android:id="@+id/contentActivableImageView"
+        layout="@layout/content_activable_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize" />
+
+    <include
+        android:id="@+id/contentXmlBasedStepProgress_bar"
+        layout="@layout/content_xml_based_step_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

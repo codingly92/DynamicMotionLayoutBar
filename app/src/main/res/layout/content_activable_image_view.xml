@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.applover.dynamicmotionlayoutbar.views.ActivableImage
+    <com.applover.dynamicmotionlayoutbar.views.ActivableImageView
         android:id="@+id/imageViewProfile"
         android:layout_width="96dp"
         android:layout_height="96dp"

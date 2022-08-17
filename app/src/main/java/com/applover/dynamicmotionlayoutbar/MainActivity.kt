@@ -39,10 +39,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeVisibilityForExamples(example: Example) {
-        binding.layout.root.isVisible = example == Example.ActivableImageScreen
+        binding.contentActivableImageView.root.isVisible = example == Example.ActivableImageScreen
+        binding.contentXmlBasedStepProgressBar.root.isVisible = example == Example.XmlBasedStepProgressBar
     }
 
-    private fun setupFirstScreen() = with(binding.layout) {
+    private fun setupFirstScreen() = with(binding.contentActivableImageView) {
         buttonActivate.setOnClickListener {
             imageViewProfile.setActive(true)
         }
@@ -53,6 +54,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     enum class Example {
-        ActivableImageScreen, StepProgressBar, StepProgressBarTwo,
+        ActivableImageScreen, XmlBasedStepProgressBar, StepProgressBarTwo,
     }
 }

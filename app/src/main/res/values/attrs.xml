@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ActivableImage">
+    <declare-styleable name="ActivableImageView">
         <attr name="android:src" />
         <attr name="android:state_active" />
         <attr name="duration" format="integer" />

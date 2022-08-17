@@ -14,7 +14,7 @@ import com.applover.dynamicmotionlayoutbar.utils.centerInParent
 import com.applover.dynamicmotionlayoutbar.utils.createSet
 
 @Suppress("SpellCheckingInspection")
-class ActivableImage @JvmOverloads constructor(
+class ActivableImageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -27,15 +27,15 @@ class ActivableImage @JvmOverloads constructor(
     init {
         context.theme.obtainStyledAttributes(
             attrs,
-            R.styleable.ActivableImage,
+            R.styleable.ActivableImageView,
             0,
             0,
         ).apply {
             try {
-                drawableRes = getResourceIdOrThrow(R.styleable.ActivableImage_android_src)
-                activeTint = getColorOrThrow(R.styleable.ActivableImage_active_tint)
-                inactiveTint = getColorOrThrow(R.styleable.ActivableImage_inactive_tint)
-                animationDuration = getIntOrThrow(R.styleable.ActivableImage_duration)
+                drawableRes = getResourceIdOrThrow(R.styleable.ActivableImageView_android_src)
+                activeTint = getColorOrThrow(R.styleable.ActivableImageView_active_tint)
+                inactiveTint = getColorOrThrow(R.styleable.ActivableImageView_inactive_tint)
+                animationDuration = getIntOrThrow(R.styleable.ActivableImageView_duration)
             } finally {
                 recycle()
             }
@@ -62,7 +62,7 @@ class ActivableImage @JvmOverloads constructor(
         val endSet = createSet {
             setColorValue(imageViewId, "ColorFilter", activeTint)
             setAlpha(imageViewId, 1f)
-            applyTo(this@ActivableImage)
+            applyTo(this@ActivableImageView)
             centerInParent(imageViewId)
         }
 
