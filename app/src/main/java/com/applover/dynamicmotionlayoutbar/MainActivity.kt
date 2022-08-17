@@ -59,38 +59,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupXmlBasedSetProgressBarExample() {
         with(binding.contentXmlBasedStepProgressBar) {
-            root.setTransitionListener(object : MotionLayout.TransitionListener {
-                override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
-                    val isEndState = root.isEndState()
-                    buttonAction.text = if (root.isEndState()) {
-                        "Previous"
-                    } else {
-                        "Next"
-                    }
-                    imageViewStart.setActive(!isEndState)
-                    imageViewEnd.setActive(isEndState)
-                }
-
-                override fun onTransitionChange(motionLayout: MotionLayout?, startId: Int, endId: Int, progress: Float) {
-                    // ignore
-                }
-
-                override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
-                    // ignore
-                }
-
-                override fun onTransitionTrigger(motionLayout: MotionLayout?, triggerId: Int, positive: Boolean, progress: Float) {
-                    // ignore
-                }
-
-            })
             buttonAction.setOnClickListener {
                 root.apply {
-                    if (isStartState()) {
+                    val isStartState = isStartState()
+                    if (isStartState) {
                         transitionToEnd()
+                        buttonAction.text = "Previous"
                     } else {
                         transitionToStart()
+                        buttonAction.text = "Next"
                     }
+                    buttonAction.text = if (isStartState) "Previous" else "Next"
+                    imageViewStart.setActive(!isStartState)
+                    imageViewEnd.setActive(isStartState)
                 }
             }
         }
