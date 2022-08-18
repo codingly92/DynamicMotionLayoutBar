@@ -3,6 +3,8 @@ package com.applover.dynamicmotionlayoutbar.views
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.getColorOrThrow
@@ -11,7 +13,7 @@ import androidx.core.content.res.getResourceIdOrThrow
 import com.applover.dynamicmotionlayoutbar.R
 import com.applover.dynamicmotionlayoutbar.utils.TwoStateMotionLayout
 import com.applover.dynamicmotionlayoutbar.utils.centerInParent
-import com.applover.dynamicmotionlayoutbar.utils.createSet
+import com.applover.dynamicmotionlayoutbar.utils.createConstraintSet
 
 @Suppress("SpellCheckingInspection")
 class ActivableImageView @JvmOverloads constructor(
@@ -24,21 +26,36 @@ class ActivableImageView @JvmOverloads constructor(
     private var inactiveTint: Int = -1
     private var drawableRes: Int = -1
 
+    constructor(
+        context: Context,
+        @DrawableRes drawableRes: Int,
+        @ColorRes activeTint: Int,
+        @ColorRes inactiveTint: Int,
+        animationDuration: Int,
+    ) : this(context, null, 0) {
+        this.drawableRes = drawableRes
+        this.activeTint = activeTint
+        this.inactiveTint = inactiveTint
+        this.animationDuration = animationDuration
+    }
+
     init {
-        context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.ActivableImageView,
-            0,
-            0,
-        ).apply {
-            try {
-                drawableRes = getResourceIdOrThrow(R.styleable.ActivableImageView_android_src)
-                activeTint = getColorOrThrow(R.styleable.ActivableImageView_active_tint)
-                inactiveTint = getColorOrThrow(R.styleable.ActivableImageView_inactive_tint)
-                animationDuration = getIntOrThrow(R.styleable.ActivableImageView_duration)
-                startAtTheEndTransition = getBoolean(R.styleable.ActivableImageView_is_active, false)
-            } finally {
-                recycle()
+        attrs?.let {
+            context.theme.obtainStyledAttributes(
+                attrs,
+                R.styleable.ActivableImageView,
+                0,
+                0,
+            ).apply {
+                try {
+                    drawableRes = getResourceIdOrThrow(R.styleable.ActivableImageView_android_src)
+                    activeTint = getColorOrThrow(R.styleable.ActivableImageView_active_tint)
+                    inactiveTint = getColorOrThrow(R.styleable.ActivableImageView_inactive_tint)
+                    animationDuration = getIntOrThrow(R.styleable.ActivableImageView_duration)
+                    startAtTheEndTransition = getBoolean(R.styleable.ActivableImageView_is_active, false)
+                } finally {
+                    recycle()
+                }
             }
         }
     }
@@ -51,13 +68,13 @@ class ActivableImageView @JvmOverloads constructor(
         imageView.setImageResource(drawableRes)
         layout.addView(imageView, layoutParams)
 
-        val startSet = createSet {
+        val startSet = createConstraintSet {
             setColorValue(imageViewId, "ColorFilter", inactiveTint)
             setAlpha(imageViewId, 0.3f)
             centerInParent(imageViewId)
         }
 
-        val endSet = createSet {
+        val endSet = createConstraintSet {
             setColorValue(imageViewId, "ColorFilter", activeTint)
             setAlpha(imageViewId, 1f)
             applyTo(this@ActivableImageView)

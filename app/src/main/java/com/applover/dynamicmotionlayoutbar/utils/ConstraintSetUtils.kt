@@ -4,7 +4,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 
-fun ConstraintLayout.createSet(block: ConstraintSet.() -> Unit): ConstraintSet {
+fun ConstraintLayout.createConstraintSet(block: ConstraintSet.() -> Unit = {}): ConstraintSet {
     val set = ConstraintSet()
     set.clone(this)
     block(set)
