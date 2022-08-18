@@ -44,15 +44,12 @@ class ActivableImageView @JvmOverloads constructor(
     }
 
     override fun createViewsAndConstraintSets(layout: ConstraintLayout): Pair<ConstraintSet, ConstraintSet> {
-        val set = ConstraintSet()
         val imageView = ImageView(layout.context)
         val imageViewId = generateViewId()
         imageView.id = imageViewId
         val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, LayoutParams.MATCH_CONSTRAINT)
         imageView.setImageResource(drawableRes)
         layout.addView(imageView, layoutParams)
-        set.clone(layout)
-        set.centerInParent(imageViewId)
 
         val startSet = createSet {
             setColorValue(imageViewId, "ColorFilter", inactiveTint)
