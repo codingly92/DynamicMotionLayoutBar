@@ -92,7 +92,7 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     fun lastStep() {
-        setStep(4)
+        setStep(stepViews.size)
     }
 
     /**
@@ -310,8 +310,7 @@ open class StepProgressBarView @JvmOverloads constructor(
         stepViews[oldStepIndex].setActive(false)
         stepViews[newStepIndex].setActive(true)
         currentStep = step
-        setTransitionDuration(animationDuration)
-        transitionToState(stepConstraints[newStepIndex].constraintSetId)
+        transitionToState(stepConstraints[newStepIndex].constraintSetId, animationDuration)
     }
 
     private fun Int.asDp() = context.dpToPx(this)

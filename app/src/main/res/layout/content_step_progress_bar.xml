@@ -40,4 +40,26 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/buttonPrevious"
         app:layout_constraintTop_toBottomOf="@+id/stepProgressBar" />
+
+    <Button
+        android:id="@+id/buttonFirst"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="First"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLast"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPrevious" />
+
+    <Button
+        android:id="@+id/buttonLast"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Last"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonFirst"
+        app:layout_constraintTop_toBottomOf="@+id/buttonPrevious" />
 </androidx.constraintlayout.widget.ConstraintLayout>

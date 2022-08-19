@@ -98,6 +98,14 @@ class MainActivity : AppCompatActivity() {
             buttonNext.setOnClickListener {
                 stepProgressBar.nextStep()
             }
+
+            buttonFirst.setOnClickListener {
+                stepProgressBar.firstStep()
+            }
+
+            buttonLast.setOnClickListener {
+                stepProgressBar.lastStep()
+            }
         }
     }
 
