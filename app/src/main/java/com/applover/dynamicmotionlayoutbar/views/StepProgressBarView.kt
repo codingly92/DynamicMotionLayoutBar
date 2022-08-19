@@ -178,7 +178,6 @@ open class StepProgressBarView @JvmOverloads constructor(
         createHorizontalChain(ConstraintSet.PARENT_ID, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, viewIds, null, ConstraintSet.CHAIN_SPREAD)
         viewIds.forEach {
             connect(it, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-            connect(it, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
         }
     }
 
@@ -204,6 +203,14 @@ open class StepProgressBarView @JvmOverloads constructor(
         connect(inactiveBarId, ConstraintSet.TOP, firstAnchor, ConstraintSet.BOTTOM)
         connect(inactiveBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
         connect(inactiveBarId, ConstraintSet.END, lastAnchor, ConstraintSet.END)
+
+        /**
+         *  Note the connection to bottom of parent!
+         *  Without that motion layout, for some unknown reason, doesn't set constraints for active bar properly
+         *  This line can also be changed to connect(it, ConstraintSet.Bottom, ConstraintSet.PARENT_ID, ConstraintSet.Bottom) in createConstrainsForAllSteps
+         *  Looks like motion layout needs one of the children to be connected to it's bottom to work correctly
+         */
+        connect(inactiveBarId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
     }
 
     /**
