@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.Space
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -76,8 +77,7 @@ open class StepProgressBarView @JvmOverloads constructor(
             stepViews.add(createStepView(it))
         }
         stepViews.first().setActive(true)
-        createInactiveBar()
-        createActiveBar()
+        createBars()
     }
 
     private fun ConstraintLayout.createStepView(step: Step): StepView {
@@ -102,30 +102,22 @@ open class StepProgressBarView @JvmOverloads constructor(
         return StepView(activableImageViewId, anchorId, activableImageView)
     }
 
-    private fun ConstraintLayout.createInactiveBar() {
-        val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4.asDp())
-        layoutParams.setMargins(0.asDp(), 16.asDp(), 0.asDp(), 16.asDp())
-
-        val imageView = ImageView(context)
-        val imageViewId = generateViewId()
-        inactiveBarId = imageViewId
-        imageView.id = imageViewId
-        imageView.setImageResource(R.drawable.bar)
-        ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(inactiveTint))
-        addView(imageView, layoutParams)
+    private fun createBars(){
+        inactiveBarId = createBar(inactiveTint)
+        activeBarId = createBar(activeTint)
     }
 
-    private fun ConstraintLayout.createActiveBar() {
+    private fun createBar(@ColorInt tint: Int): Int {
         val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4.asDp())
         layoutParams.setMargins(0.asDp(), 16.asDp(), 0.asDp(), 16.asDp())
 
         val imageView = ImageView(context)
         val imageViewId = generateViewId()
-        activeBarId = imageViewId
         imageView.id = imageViewId
         imageView.setImageResource(R.drawable.bar)
-        ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(activeTint))
+        ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(tint))
         addView(imageView, layoutParams)
+        return imageViewId
     }
 
     private fun createInitialConstraints() = createConstraintSet().apply {
