@@ -55,18 +55,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     fun initialize(steps: List<Step>) {
-        resetViews()
-        steps.forEach {
-            stepViews.add(createStepView(it))
-        }
-        stepViews.first().setActive(true)
-
-        createInactiveBar()
-        createActiveBar()
-
-        val constraintSet = createConstraintSet()
-        constraintSet.createConstraints()
-        constraintSet.applyTo(this)
+        createViews(steps)
+        createInitialConstraints()
         createTransitions()
     }
 
@@ -80,111 +70,36 @@ open class StepProgressBarView @JvmOverloads constructor(
         setStep(currentStep + 1)
     }
 
-    private fun setStep(step: Int) {
-        if (step == currentStep) return
-        val oldStepIndex = currentStep - 1
-        val newStepIndex = step - 1
-        stepViews[oldStepIndex].setActive(false)
-        stepViews[newStepIndex].setActive(true)
-        currentStep = step
-        setTransitionDuration(animationDuration)
-        transitionToState(stepConstraints[newStepIndex].constraintSetId)
-    }
-
-    private fun createTransitions() {
-        createConstraintsForSteps()
-        val scene = MotionScene(this)
-        var firstTransition: MotionScene.Transition? = null
-
-        createConstraintsBetweenSteps().forEachIndexed { index, pair ->
-            val transition = scene.createTransition(pair)
-            scene.addTransition(transition)
-            if (index == 0) {
-                firstTransition = transition
-            }
+    private fun createViews(steps: List<Step>) {
+        resetViews()
+        steps.forEach {
+            stepViews.add(createStepView(it))
         }
-
-        setScene(scene)
-        setTransition(firstTransition)
+        stepViews.first().setActive(true)
+        createInactiveBar()
+        createActiveBar()
     }
 
-    private fun createConstraintsForSteps() {
-        stepConstraints.addAll(stepViews.map { StepConstraintSet(generateViewId(), it.createConstraintsForStep()) })
-    }
-
-    private fun createConstraintsBetweenSteps(): MutableList<Pair<StepConstraintSet, StepConstraintSet>> {
-        val allContraints = mutableListOf<Pair<StepConstraintSet, StepConstraintSet>>()
-        stepConstraints.forEachIndexed { index, constraintsSet ->
-            // No next step for last one
-            if (index == stepViews.lastIndex) return@forEachIndexed
-            allContraints.add(constraintsSet to stepConstraints[index + 1])
-        }
-        return allContraints
-    }
-
-    private fun StepView.createConstraintsForStep() = createConstraintSet {
-//
-        connect(activeBarId, ConstraintSet.START, stepViews.first().anchorViewId, ConstraintSet.START)
-        connect(activeBarId, ConstraintSet.END, anchorViewId, ConstraintSet.END)
-    }
-
-    private fun MotionScene.createTransition(sets: Pair<StepConstraintSet, StepConstraintSet>): MotionScene.Transition {
-        val startConstraintSet = sets.first
-        val endConstraintSet = sets.second
-        return TransitionBuilder.buildTransition(
-            this,
-            generateViewId(),
-            startConstraintSet.constraintSetId,
-            startConstraintSet.constraintSet,
-            endConstraintSet.constraintSetId,
-            endConstraintSet.constraintSet,
+    private fun ConstraintLayout.createStepView(step: Step): StepView {
+        val activableImageView = ActivableImageView(
+            context,
+            drawableRes = step.drawableRes,
+            activeTint = step.activeTint,
+            inactiveTint = step.inactiveTint,
+            animationDuration = animationDuration
         )
-    }
+        val activableImageViewId = generateViewId()
+        activableImageView.id = activableImageViewId
+        val layoutParamsWrapMarginMedium = LayoutParams(48.asDp(), 48.asDp())
+        layoutParamsWrapMarginMedium.setMargins(16.asDp(), 16.asDp(), 16.asDp(), 16.asDp())
+        addView(activableImageView, layoutParamsWrapMarginMedium)
 
-    private fun resetViews() {
-        removeAllViews()
-        stepViews.clear()
-    }
+        val anchor = Space(context)
+        val anchorId = generateViewId()
+        anchor.id = anchorId
+        addView(anchor, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
 
-    private fun ConstraintSet.createConstraints() {
-        createConstrainsForAllSteps()
-        setConstraintsForAllAnchors()
-        setConstraintsForInactiveBar()
-        setConstraintsForActiveBar()
-    }
-
-    private fun ConstraintSet.createConstrainsForAllSteps() {
-        val viewIds = stepViews.map { it.imageViewId }.toIntArray()
-        createHorizontalChain(ConstraintSet.PARENT_ID, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, viewIds, null, ConstraintSet.CHAIN_SPREAD)
-        viewIds.forEach {
-            connect(it, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-            connect(it, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-        }
-    }
-
-    private fun ConstraintSet.setConstraintsForAllAnchors() {
-        stepViews.forEach {
-            connect(it.anchorViewId, ConstraintSet.TOP, it.imageViewId, ConstraintSet.BOTTOM)
-            connect(it.anchorViewId, ConstraintSet.START, it.imageViewId, ConstraintSet.START)
-            connect(it.anchorViewId, ConstraintSet.END, it.imageViewId, ConstraintSet.END)
-        }
-    }
-
-    private fun ConstraintSet.setConstraintsForInactiveBar() {
-        val firstAnchor = stepViews.first().anchorViewId
-        val lastAnchor = stepViews.last().anchorViewId
-
-        connect(inactiveBarId, ConstraintSet.TOP, firstAnchor, ConstraintSet.BOTTOM)
-        connect(inactiveBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
-        connect(inactiveBarId, ConstraintSet.END, lastAnchor, ConstraintSet.END)
-    }
-
-    private fun ConstraintSet.setConstraintsForActiveBar() {
-        val firstAnchor = stepViews.first().anchorViewId
-        connect(activeBarId, ConstraintSet.TOP, inactiveBarId, ConstraintSet.TOP)
-        connect(activeBarId, ConstraintSet.BOTTOM, inactiveBarId, ConstraintSet.BOTTOM)
-        connect(activeBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
-        connect(activeBarId, ConstraintSet.END, firstAnchor, ConstraintSet.END)
+        return StepView(activableImageViewId, anchorId, activableImageView)
     }
 
     private fun ConstraintLayout.createInactiveBar() {
@@ -213,27 +128,110 @@ open class StepProgressBarView @JvmOverloads constructor(
         addView(imageView, layoutParams)
     }
 
-    private fun ConstraintLayout.createStepView(step: Step): StepView {
-        val layoutParamsWrapMarginMedium = LayoutParams(48.asDp(), 48.asDp())
-        layoutParamsWrapMarginMedium.setMargins(16.asDp(), 16.asDp(), 16.asDp(), 16.asDp())
+    private fun createInitialConstraints() = createConstraintSet().apply {
+        createConstrainsForAllSteps()
+        setConstraintsForAllAnchors()
+        setConstraintsForInactiveBar()
+        setConstraintsForActiveBar()
+        applyTo(this@StepProgressBarView)
+    }
 
-        val activableImageView = ActivableImageView(
-            context,
-            drawableRes = step.drawableRes,
-            activeTint = step.activeTint,
-            inactiveTint = step.inactiveTint,
-            animationDuration = animationDuration
+    private fun ConstraintSet.createConstrainsForAllSteps() {
+        val viewIds = stepViews.map { it.imageViewId }.toIntArray()
+        createHorizontalChain(ConstraintSet.PARENT_ID, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, viewIds, null, ConstraintSet.CHAIN_SPREAD)
+        viewIds.forEach {
+            connect(it, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+            connect(it, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        }
+    }
+
+    private fun ConstraintSet.setConstraintsForAllAnchors() {
+        stepViews.forEach {
+            connect(it.anchorViewId, ConstraintSet.TOP, it.imageViewId, ConstraintSet.BOTTOM)
+            connect(it.anchorViewId, ConstraintSet.START, it.imageViewId, ConstraintSet.START)
+            connect(it.anchorViewId, ConstraintSet.END, it.imageViewId, ConstraintSet.END)
+        }
+    }
+
+    private fun ConstraintSet.setConstraintsForInactiveBar() {
+        val firstAnchor = stepViews.first().anchorViewId
+        val lastAnchor = stepViews.last().anchorViewId
+        connect(inactiveBarId, ConstraintSet.TOP, firstAnchor, ConstraintSet.BOTTOM)
+        connect(inactiveBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
+        connect(inactiveBarId, ConstraintSet.END, lastAnchor, ConstraintSet.END)
+    }
+
+    private fun ConstraintSet.setConstraintsForActiveBar() {
+        val firstAnchor = stepViews.first().anchorViewId
+        connect(activeBarId, ConstraintSet.TOP, inactiveBarId, ConstraintSet.TOP)
+        connect(activeBarId, ConstraintSet.BOTTOM, inactiveBarId, ConstraintSet.BOTTOM)
+        connect(activeBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
+        connect(activeBarId, ConstraintSet.END, firstAnchor, ConstraintSet.END)
+    }
+
+    private fun createTransitions() {
+        createConstraintsForSteps()
+        val scene = MotionScene(this)
+        var firstTransition: MotionScene.Transition? = null
+
+        createConstraintsBetweenSteps().forEachIndexed { index, pair ->
+            val transition = scene.createTransition(pair)
+            scene.addTransition(transition)
+            if (index == 0) {
+                firstTransition = transition
+            }
+        }
+
+        setScene(scene)
+        setTransition(firstTransition)
+    }
+
+    private fun createConstraintsForSteps() {
+        stepConstraints.addAll(stepViews.map { StepConstraintSet(generateViewId(), it.createConstraintsForStep()) })
+    }
+
+    private fun StepView.createConstraintsForStep() = createConstraintSet {
+        connect(activeBarId, ConstraintSet.START, stepViews.first().anchorViewId, ConstraintSet.START)
+        connect(activeBarId, ConstraintSet.END, anchorViewId, ConstraintSet.END)
+    }
+
+    private fun createConstraintsBetweenSteps(): MutableList<Pair<StepConstraintSet, StepConstraintSet>> {
+        val allContraints = mutableListOf<Pair<StepConstraintSet, StepConstraintSet>>()
+        stepConstraints.forEachIndexed { index, constraintsSet ->
+            // No next step for last one
+            if (index == stepViews.lastIndex) return@forEachIndexed
+            allContraints.add(constraintsSet to stepConstraints[index + 1])
+        }
+        return allContraints
+    }
+
+    private fun MotionScene.createTransition(sets: Pair<StepConstraintSet, StepConstraintSet>): MotionScene.Transition {
+        val startConstraintSet = sets.first
+        val endConstraintSet = sets.second
+        return TransitionBuilder.buildTransition(
+            this,
+            generateViewId(),
+            startConstraintSet.constraintSetId,
+            startConstraintSet.constraintSet,
+            endConstraintSet.constraintSetId,
+            endConstraintSet.constraintSet,
         )
-        val activableImageViewId = generateViewId()
-        activableImageView.id = activableImageViewId
-        addView(activableImageView, layoutParamsWrapMarginMedium)
+    }
 
-        val anchor = Space(context)
-        val anchorId = generateViewId()
-        anchor.id = anchorId
-        addView(anchor, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+    private fun resetViews() {
+        removeAllViews()
+        stepViews.clear()
+    }
 
-        return StepView(activableImageViewId, anchorId, activableImageView)
+    private fun setStep(step: Int) {
+        if (step == currentStep) return
+        val oldStepIndex = currentStep - 1
+        val newStepIndex = step - 1
+        stepViews[oldStepIndex].setActive(false)
+        stepViews[newStepIndex].setActive(true)
+        currentStep = step
+        setTransitionDuration(animationDuration)
+        transitionToState(stepConstraints[newStepIndex].constraintSetId)
     }
 
     private fun Int.asDp() = context.dpToPx(this)
