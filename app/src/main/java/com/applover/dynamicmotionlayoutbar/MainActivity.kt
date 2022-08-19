@@ -90,6 +90,14 @@ class MainActivity : AppCompatActivity() {
                     StepProgressBarView.Step(R.drawable.ic_local_shipping_48px, activeTint, inactiveTint),
                 )
             )
+
+            buttonPrevious.setOnClickListener {
+                stepProgressBar.previousStep()
+            }
+
+            buttonNext.setOnClickListener {
+                stepProgressBar.nextStep()
+            }
         }
     }
 

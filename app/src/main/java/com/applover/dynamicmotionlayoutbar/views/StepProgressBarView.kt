@@ -31,6 +31,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     private val stepViews = mutableListOf<StepView>()
     private var inactiveBarId: Int = -1
 
+    private var currentStep: Int = 1
+
     init {
         context.theme.obtainStyledAttributes(
             attrs,
@@ -56,12 +58,29 @@ open class StepProgressBarView @JvmOverloads constructor(
         stepViews.first().setActive(true)
 
         createInactiveBar()
-        
+
         val constraintSet = createConstraintSet()
         constraintSet.createConstraints()
         constraintSet.applyTo(this)
 
         invalidate()
+    }
+
+    fun previousStep(){
+        if(currentStep == 1) return
+        setStep(currentStep - 1)
+    }
+
+    fun nextStep(){
+        if(currentStep == stepViews.size) return
+        setStep(currentStep + 1)
+    }
+
+    private fun setStep(step: Int) {
+        if(step == currentStep) return
+        stepViews[currentStep - 1].setActive(false)
+        stepViews[step - 1].setActive(true)
+        currentStep = step
     }
 
     private fun resetViews() {
