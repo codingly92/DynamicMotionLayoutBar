@@ -79,7 +79,6 @@ class ActivableImageView @JvmOverloads constructor(
         val endSet = createConstraintSet {
             setColorValue(imageViewId, "ColorFilter", activeTint)
             setAlpha(imageViewId, 1f)
-            applyTo(this@ActivableImageView)
             centerInParent(imageViewId)
         }
 
