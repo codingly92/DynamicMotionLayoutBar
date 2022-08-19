@@ -8,6 +8,8 @@ import android.widget.Space
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.constraintlayout.motion.widget.MotionScene
+import androidx.constraintlayout.motion.widget.TransitionBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.getColorOrThrow
@@ -29,7 +31,9 @@ open class StepProgressBarView @JvmOverloads constructor(
     private var animationDuration = DEFAULT_ANIMATION_SPEED
 
     private val stepViews = mutableListOf<StepView>()
+    private val stepConstraints = mutableListOf<StepConstraintSet>()
     private var inactiveBarId: Int = -1
+    private var activeBarId: Int = -1
 
     private var currentStep: Int = 1
 
@@ -58,29 +62,76 @@ open class StepProgressBarView @JvmOverloads constructor(
         stepViews.first().setActive(true)
 
         createInactiveBar()
+        createActiveBar()
 
         val constraintSet = createConstraintSet()
         constraintSet.createConstraints()
         constraintSet.applyTo(this)
 
-        invalidate()
+        createTransitions()
     }
 
-    fun previousStep(){
-        if(currentStep == 1) return
+    fun previousStep() {
+        if (currentStep == 1) return
         setStep(currentStep - 1)
     }
 
-    fun nextStep(){
-        if(currentStep == stepViews.size) return
+    fun nextStep() {
+        if (currentStep == stepViews.size) return
         setStep(currentStep + 1)
     }
 
     private fun setStep(step: Int) {
-        if(step == currentStep) return
+        if (step == currentStep) return
         stepViews[currentStep - 1].setActive(false)
-        stepViews[step - 1].setActive(true)
+        val newStepIndex = step - 1
+        stepViews[newStepIndex].setActive(true)
         currentStep = step
+        transitionToState(stepConstraints[newStepIndex].constraintSetId)
+    }
+
+    private fun createTransitions() {
+        createConstraintsForSteps()
+        val scene = MotionScene(this)
+        createConstraintsBetweenSteps().forEach {
+            scene.createTransitions(it)
+        }
+        setScene(scene)
+        setTransitionDuration(animationDuration)
+    }
+
+    private fun createConstraintsForSteps() {
+        stepConstraints.addAll(stepViews.map { StepConstraintSet(generateViewId(), it.createConstraintsForStep()) })
+    }
+
+    private fun createConstraintsBetweenSteps(): MutableList<Pair<StepConstraintSet, StepConstraintSet>> {
+        val allContraints = mutableListOf<Pair<StepConstraintSet, StepConstraintSet>>()
+        stepConstraints.forEachIndexed { index, constraintsSet ->
+            // No next step for last one
+            if (index == stepViews.lastIndex) return@forEachIndexed
+            allContraints.add(constraintsSet to stepConstraints[index + 1])
+        }
+        return allContraints
+    }
+
+    private fun StepView.createConstraintsForStep() = createConstraintSet {
+        connect(activeBarId, ConstraintSet.TOP, inactiveBarId, ConstraintSet.TOP)
+        connect(activeBarId, ConstraintSet.BOTTOM, inactiveBarId, ConstraintSet.BOTTOM)
+        connect(activeBarId, ConstraintSet.START, stepViews.first().anchorViewId, ConstraintSet.START)
+        connect(activeBarId, ConstraintSet.END, anchorViewId, ConstraintSet.END)
+    }
+
+    private fun MotionScene.createTransitions(sets: Pair<StepConstraintSet, StepConstraintSet>): MotionScene.Transition {
+        val startConstraintSet = sets.first
+        val endConstraintSet = sets.second
+        return TransitionBuilder.buildTransition(
+            this,
+            generateViewId(),
+            startConstraintSet.constraintSetId,
+            startConstraintSet.constraintSet,
+            endConstraintSet.constraintSetId,
+            endConstraintSet.constraintSet,
+        )
     }
 
     private fun resetViews() {
@@ -92,6 +143,7 @@ open class StepProgressBarView @JvmOverloads constructor(
         createConstrainsForAllSteps()
         setConstraintsForAllAnchors()
         setConstraintsForInactiveBar()
+        setConstraintsForActiveBar()
     }
 
     private fun ConstraintSet.createConstrainsForAllSteps() {
@@ -120,6 +172,14 @@ open class StepProgressBarView @JvmOverloads constructor(
         connect(inactiveBarId, ConstraintSet.END, lastAnchor, ConstraintSet.END)
     }
 
+    private fun ConstraintSet.setConstraintsForActiveBar() {
+        val firstAnchor = stepViews.first().anchorViewId
+
+        connect(inactiveBarId, ConstraintSet.TOP, firstAnchor, ConstraintSet.BOTTOM)
+        connect(inactiveBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
+        connect(inactiveBarId, ConstraintSet.END, firstAnchor, ConstraintSet.END)
+    }
+
     private fun ConstraintLayout.createInactiveBar() {
         val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4.asDp())
         layoutParams.setMargins(0.asDp(), 16.asDp(), 0.asDp(), 16.asDp())
@@ -130,6 +190,19 @@ open class StepProgressBarView @JvmOverloads constructor(
         imageView.id = imageViewId
         imageView.setImageResource(R.drawable.bar)
         ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(inactiveTint))
+        addView(imageView, layoutParams)
+    }
+
+    private fun ConstraintLayout.createActiveBar() {
+        val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4.asDp())
+        layoutParams.setMargins(0.asDp(), 16.asDp(), 0.asDp(), 16.asDp())
+
+        val imageView = ImageView(context)
+        val imageViewId = generateViewId()
+        activeBarId = imageViewId
+        imageView.id = imageViewId
+        imageView.setImageResource(R.drawable.bar)
+        ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(activeTint))
         addView(imageView, layoutParams)
     }
 
@@ -163,6 +236,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     data class Step(@DrawableRes val drawableRes: Int, @ColorRes val activeTint: Int, @ColorRes val inactiveTint: Int)
+
+    data class StepConstraintSet(val constraintSetId: Int, val constraintSet: ConstraintSet)
 
     companion object {
         private const val DEFAULT_ANIMATION_SPEED = 500
