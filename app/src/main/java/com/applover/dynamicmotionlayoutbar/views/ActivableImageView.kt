@@ -37,6 +37,7 @@ class ActivableImageView @JvmOverloads constructor(
         this.activeTint = activeTint
         this.inactiveTint = inactiveTint
         this.animationDuration = animationDuration
+        setupView()
     }
 
     init {

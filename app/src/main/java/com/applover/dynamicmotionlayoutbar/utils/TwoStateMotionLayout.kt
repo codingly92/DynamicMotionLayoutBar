@@ -19,6 +19,10 @@ abstract class TwoStateMotionLayout(
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+        setupView()
+    }
+
+    protected fun setupView(){
         val constraintSets = createViewsAndConstraintSets(this)
         val scene = MotionScene(this)
         val updatedTransition = createTransitions(scene, constraintSets)
@@ -33,7 +37,7 @@ abstract class TwoStateMotionLayout(
 
     abstract fun createViewsAndConstraintSets(layout: ConstraintLayout): Pair<ConstraintSet, ConstraintSet>
 
-    private fun createTransitions(scene: MotionScene, sets: Pair<ConstraintSet, ConstraintSet>) =
+    private fun createTransitions(scene: MotionScene, sets: Pair<ConstraintSet, ConstraintSet>): MotionScene.Transition =
         TransitionBuilder.buildTransition(
             scene,
             generateViewId(),

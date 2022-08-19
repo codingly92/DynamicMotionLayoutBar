@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="duration" format="integer" />
+    <attr name="active_tint" format="reference|color" />
+    <attr name="inactive_tint" format="reference|color" />
+
     <declare-styleable name="ActivableImageView">
         <attr name="android:src" />
         <attr name="android:state_active" />
-        <attr name="duration" format="integer" />
-        <attr name="active_tint" format="reference|color" />
-        <attr name="inactive_tint" format="reference|color" />
+        <attr name="duration" />
+        <attr name="active_tint" />
+        <attr name="inactive_tint" />
         <attr name="is_active" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="StepProgressBarView">
+        <attr name="duration" />
+        <attr name="active_tint" />
+        <attr name="inactive_tint" />
     </declare-styleable>
 </resources>

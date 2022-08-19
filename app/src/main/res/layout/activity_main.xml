@@ -29,8 +29,16 @@
         android:layout_marginTop="?attr/actionBarSize" />
 
     <include
-        android:id="@+id/contentXmlBasedStepProgress_bar"
+        android:id="@+id/contentXmlBasedStepProgressBar"
         layout="@layout/content_xml_based_step_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/contentStepProgressBar"
+        layout="@layout/content_step_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"

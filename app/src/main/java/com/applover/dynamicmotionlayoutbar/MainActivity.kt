@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.applover.dynamicmotionlayoutbar.databinding.ActivityMainBinding
 import com.applover.dynamicmotionlayoutbar.utils.isStartState
+import com.applover.dynamicmotionlayoutbar.views.StepProgressBarView
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
@@ -27,8 +28,9 @@ class MainActivity : AppCompatActivity() {
             toggleExample(view)
         }
 
-        setupFirstScreen()
-        setupXmlBasedSetProgressBarExample()
+        setupActivableImageExample()
+        setupXmlBasedStepProgressBarExample()
+        setupStepProgressBarExample()
     }
 
     private fun toggleExample(view: View) {
@@ -43,9 +45,10 @@ class MainActivity : AppCompatActivity() {
     private fun changeVisibilityForExamples(example: Example) {
         binding.contentActivableImageView.root.isVisible = example == Example.ActivableImageScreen
         binding.contentXmlBasedStepProgressBar.root.isVisible = example == Example.XmlBasedStepProgressBar
+        binding.contentStepProgressBar.root.isVisible = example == Example.StepProgressBar
     }
 
-    private fun setupFirstScreen() = with(binding.contentActivableImageView) {
+    private fun setupActivableImageExample() = with(binding.contentActivableImageView) {
         buttonActivate.setOnClickListener {
             imageViewProfile.setActive(true)
         }
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupXmlBasedSetProgressBarExample() {
+    private fun setupXmlBasedStepProgressBarExample() {
         with(binding.contentXmlBasedStepProgressBar) {
             buttonAction.setOnClickListener {
                 root.apply {
@@ -75,7 +78,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupStepProgressBarExample() {
+        val activeTint = R.color.active
+        val inactiveTint = R.color.inactive
+        with(binding.contentStepProgressBar) {
+            stepProgressBar.initialize(
+                listOf(
+                    StepProgressBarView.Step(R.drawable.ic_add_shopping_cart_48px, activeTint, inactiveTint),
+                    StepProgressBarView.Step(R.drawable.ic_shopping_cart_48px, activeTint, inactiveTint),
+                    StepProgressBarView.Step(R.drawable.ic_payments_48px, activeTint, inactiveTint),
+                    StepProgressBarView.Step(R.drawable.ic_local_shipping_48px, activeTint, inactiveTint),
+                )
+            )
+        }
+    }
+
     enum class Example {
-        ActivableImageScreen, XmlBasedStepProgressBar, StepProgressBarTwo,
+        ActivableImageScreen, XmlBasedStepProgressBar, StepProgressBar,
     }
 }
