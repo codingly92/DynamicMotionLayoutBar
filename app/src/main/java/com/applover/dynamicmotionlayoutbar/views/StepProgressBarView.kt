@@ -67,13 +67,13 @@ open class StepProgressBarView @JvmOverloads constructor(
         val constraintSet = createConstraintSet()
         constraintSet.createConstraints()
         constraintSet.applyTo(this)
-
         createTransitions()
     }
 
     fun previousStep() {
         if (currentStep == 1) return
-        setStep(currentStep - 1) }
+        setStep(currentStep - 1)
+    }
 
     fun nextStep() {
         if (currentStep == stepViews.size) return
@@ -87,9 +87,8 @@ open class StepProgressBarView @JvmOverloads constructor(
         stepViews[oldStepIndex].setActive(false)
         stepViews[newStepIndex].setActive(true)
         currentStep = step
-        setTransition(stepConstraints[oldStepIndex].constraintSetId, stepConstraints[newStepIndex].constraintSetId)
         setTransitionDuration(animationDuration)
-        transitionToEnd()
+        transitionToState(stepConstraints[newStepIndex].constraintSetId)
     }
 
     private fun createTransitions() {
@@ -99,7 +98,7 @@ open class StepProgressBarView @JvmOverloads constructor(
 
         createConstraintsBetweenSteps().forEachIndexed { index, pair ->
             val transition = scene.createTransition(pair)
-            // scene.addTransition(transition)
+            scene.addTransition(transition)
             if (index == 0) {
                 firstTransition = transition
             }
@@ -124,11 +123,9 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     private fun StepView.createConstraintsForStep() = createConstraintSet {
-        connect(activeBarId, ConstraintSet.TOP, inactiveBarId, ConstraintSet.TOP)
-        connect(activeBarId, ConstraintSet.BOTTOM, inactiveBarId, ConstraintSet.BOTTOM)
+//
         connect(activeBarId, ConstraintSet.START, stepViews.first().anchorViewId, ConstraintSet.START)
         connect(activeBarId, ConstraintSet.END, anchorViewId, ConstraintSet.END)
-        createConstraints()
     }
 
     private fun MotionScene.createTransition(sets: Pair<StepConstraintSet, StepConstraintSet>): MotionScene.Transition {
@@ -153,6 +150,7 @@ open class StepProgressBarView @JvmOverloads constructor(
         createConstrainsForAllSteps()
         setConstraintsForAllAnchors()
         setConstraintsForInactiveBar()
+        setConstraintsForActiveBar()
     }
 
     private fun ConstraintSet.createConstrainsForAllSteps() {
@@ -179,6 +177,14 @@ open class StepProgressBarView @JvmOverloads constructor(
         connect(inactiveBarId, ConstraintSet.TOP, firstAnchor, ConstraintSet.BOTTOM)
         connect(inactiveBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
         connect(inactiveBarId, ConstraintSet.END, lastAnchor, ConstraintSet.END)
+    }
+
+    private fun ConstraintSet.setConstraintsForActiveBar() {
+        val firstAnchor = stepViews.first().anchorViewId
+        connect(activeBarId, ConstraintSet.TOP, inactiveBarId, ConstraintSet.TOP)
+        connect(activeBarId, ConstraintSet.BOTTOM, inactiveBarId, ConstraintSet.BOTTOM)
+        connect(activeBarId, ConstraintSet.START, firstAnchor, ConstraintSet.START)
+        connect(activeBarId, ConstraintSet.END, firstAnchor, ConstraintSet.END)
     }
 
     private fun ConstraintLayout.createInactiveBar() {
