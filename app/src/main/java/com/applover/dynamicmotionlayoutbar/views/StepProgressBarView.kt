@@ -318,10 +318,10 @@ open class StepProgressBarView @JvmOverloads constructor(
     private data class StepView(val imageViewId: Int, val anchorViewId: Int, private val activableImageView: ActivableImageView) {
         fun setActive(isActive: Boolean) = activableImageView.setActive(isActive)
     }
+    
+    private data class StepConstraintSet(val constraintSetId: Int, val constraintSet: ConstraintSet)
 
     data class Step(@DrawableRes val drawableRes: Int, @ColorRes val activeTint: Int, @ColorRes val inactiveTint: Int)
-
-    data class StepConstraintSet(val constraintSetId: Int, val constraintSet: ConstraintSet)
 
     companion object {
         private const val DEFAULT_ANIMATION_SPEED = 500
