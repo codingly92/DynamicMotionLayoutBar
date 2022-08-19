@@ -112,19 +112,7 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     private fun ConstraintLayout.createStepView(step: Step): StepView {
-        val imageView = ActivableImageView(
-            context,
-            drawableRes = step.drawableRes,
-            activeTint = step.activeTint,
-            inactiveTint = step.inactiveTint,
-            animationDuration = animationDuration
-        )
-        val imageViewId = generateViewId()
-        imageView.id = imageViewId
-        val layoutParams = LayoutParams(48, 48)
-        addView(imageView, layoutParams)
-
-        val layoutParamsWrapMarginMedium = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        val layoutParamsWrapMarginMedium = LayoutParams(80, 80)
         layoutParamsWrapMarginMedium.setMargins(16, 16, 16, 16)
 
         val activableImageView = ActivableImageView(
@@ -141,9 +129,9 @@ open class StepProgressBarView @JvmOverloads constructor(
         val anchor = Space(context)
         val anchorId = generateViewId()
         anchor.id = anchorId
-        addView(anchor, layoutParamsWrapMarginMedium)
+        addView(anchor, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
 
-        return StepView(imageViewId, anchorId, activableImageView)
+        return StepView(activableImageViewId, anchorId, activableImageView)
     }
 
     private data class StepView(val imageViewId: Int, val anchorViewId: Int, private val activableImageView: ActivableImageView)
