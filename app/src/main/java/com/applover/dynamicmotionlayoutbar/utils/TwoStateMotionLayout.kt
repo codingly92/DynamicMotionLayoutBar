@@ -22,24 +22,24 @@ abstract class TwoStateMotionLayout(
         setupView()
     }
 
-    protected fun setupView(){
-        val constraintSets = createViewsAndConstraintSets(this)
+    protected fun setupView() {
+        val constraintSets = createViewsAndConstraintSets()
         val scene = MotionScene(this)
-        val updatedTransition = createTransitions(scene, constraintSets)
+        val updatedTransition = scene.createTransitions(constraintSets)
         scene.addTransition(updatedTransition)
         setScene(scene)
         setTransition(updatedTransition)
         setTransitionDuration(animationDuration)
-        if(startAtTheEndTransition){
+        if (startAtTheEndTransition) {
             progress = 1f
         }
     }
 
-    abstract fun createViewsAndConstraintSets(layout: ConstraintLayout): Pair<ConstraintSet, ConstraintSet>
+    abstract fun ConstraintLayout.createViewsAndConstraintSets(): Pair<ConstraintSet, ConstraintSet>
 
-    private fun createTransitions(scene: MotionScene, sets: Pair<ConstraintSet, ConstraintSet>): MotionScene.Transition =
+    private fun MotionScene.createTransitions(sets: Pair<ConstraintSet, ConstraintSet>): MotionScene.Transition =
         TransitionBuilder.buildTransition(
-            scene,
+            this,
             generateViewId(),
             generateViewId(),
             sets.first,
