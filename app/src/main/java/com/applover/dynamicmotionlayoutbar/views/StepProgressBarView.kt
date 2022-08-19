@@ -15,6 +15,7 @@ import androidx.core.content.res.getIntOrThrow
 import androidx.core.widget.ImageViewCompat
 import com.applover.dynamicmotionlayoutbar.R
 import com.applover.dynamicmotionlayoutbar.utils.createConstraintSet
+import com.applover.dynamicmotionlayoutbar.utils.dpToPx
 
 @Suppress("SpellCheckingInspection")
 open class StepProgressBarView @JvmOverloads constructor(
@@ -52,8 +53,10 @@ open class StepProgressBarView @JvmOverloads constructor(
         steps.forEach {
             stepViews.add(createStepView(it))
         }
-        createInactiveBar()
+        stepViews.first().setActive(true)
 
+        createInactiveBar()
+        
         val constraintSet = createConstraintSet()
         constraintSet.createConstraints()
         constraintSet.applyTo(this)
@@ -99,8 +102,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     private fun ConstraintLayout.createInactiveBar() {
-        val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4)
-        layoutParams.setMargins(0, 16, 0, 16)
+        val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 4.asDp())
+        layoutParams.setMargins(0.asDp(), 16.asDp(), 0.asDp(), 16.asDp())
 
         val imageView = ImageView(context)
         val imageViewId = generateViewId()
@@ -112,8 +115,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     private fun ConstraintLayout.createStepView(step: Step): StepView {
-        val layoutParamsWrapMarginMedium = LayoutParams(80, 80)
-        layoutParamsWrapMarginMedium.setMargins(16, 16, 16, 16)
+        val layoutParamsWrapMarginMedium = LayoutParams(48.asDp(), 48.asDp())
+        layoutParamsWrapMarginMedium.setMargins(16.asDp(), 16.asDp(), 16.asDp(), 16.asDp())
 
         val activableImageView = ActivableImageView(
             context,
@@ -134,7 +137,11 @@ open class StepProgressBarView @JvmOverloads constructor(
         return StepView(activableImageViewId, anchorId, activableImageView)
     }
 
-    private data class StepView(val imageViewId: Int, val anchorViewId: Int, private val activableImageView: ActivableImageView)
+    private fun Int.asDp() = context.dpToPx(this)
+
+    private data class StepView(val imageViewId: Int, val anchorViewId: Int, private val activableImageView: ActivableImageView) {
+        fun setActive(isActive: Boolean) = activableImageView.setActive(isActive)
+    }
 
     data class Step(@DrawableRes val drawableRes: Int, @ColorRes val activeTint: Int, @ColorRes val inactiveTint: Int)
 

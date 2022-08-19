@@ -7,6 +7,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getIntOrThrow
 import androidx.core.content.res.getResourceIdOrThrow
@@ -34,8 +35,8 @@ class ActivableImageView @JvmOverloads constructor(
         animationDuration: Int,
     ) : this(context, null, 0) {
         this.drawableRes = drawableRes
-        this.activeTint = activeTint
-        this.inactiveTint = inactiveTint
+        this.activeTint = ContextCompat.getColor(context, activeTint)
+        this.inactiveTint = ContextCompat.getColor(context, inactiveTint)
         this.animationDuration = animationDuration
         setupView()
     }
