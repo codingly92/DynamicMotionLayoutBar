@@ -8,15 +8,13 @@ import android.widget.Space
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.constraintlayout.motion.widget.MotionScene
-import androidx.constraintlayout.motion.widget.TransitionBuilder
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getIntOrThrow
 import androidx.core.widget.ImageViewCompat
 import com.applover.dynamicmotionlayoutbar.R
+import com.applover.dynamicmotionlayoutbar.utils.StepStateMotionLayout
 import com.applover.dynamicmotionlayoutbar.utils.createConstraintSet
 import com.applover.dynamicmotionlayoutbar.utils.dpToPx
 
@@ -25,18 +23,15 @@ open class StepProgressBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MotionLayout(context, attrs, defStyleAttr) {
+) : StepStateMotionLayout(context, attrs, defStyleAttr) {
+
+    private val stepViews = mutableListOf<StepView>()
 
     private var activeTint: Int = -1
     private var inactiveTint: Int = -1
-    private var animationDuration = DEFAULT_ANIMATION_SPEED
 
-    private val stepViews = mutableListOf<StepView>()
-    private val stepConstraints = mutableListOf<StepConstraintSet>()
-    private var inactiveBarId: Int = -1
     private var activeBarId: Int = -1
-
-    private var currentStep: Int = 1
+    private var inactiveBarId: Int = -1
 
     /**
      * Initialize from xml and get attributes for colors of bars and animation duration
@@ -69,10 +64,6 @@ open class StepProgressBarView @JvmOverloads constructor(
         createTransitions()
     }
 
-    /**
-     * Simple logic for changing current step by one
-     */
-
     fun previousStep() {
         if (currentStep == 1) return
         setStep(currentStep - 1)
@@ -83,12 +74,6 @@ open class StepProgressBarView @JvmOverloads constructor(
         setStep(currentStep + 1)
     }
 
-    /**
-     * It is possible to set steps that are not directly connected by transition
-     * Note that in our example we have connections one by one: 1 to 2, 2 to 3, 3 to 4
-     * But we can jump from 1 to 4 or 4 to 1 without any issue
-     */
-
     fun firstStep() {
         setStep(1)
     }
@@ -98,9 +83,8 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     /**
-     * Initial step is to create all views
-     *
-     * Beside that we create bars: inactive and active
+     * For starters we need to create all needed views
+     * Images, anchors and bars: inactive and active
      */
     private fun createViews(steps: List<Step>) {
         resetViews()
@@ -109,6 +93,11 @@ open class StepProgressBarView @JvmOverloads constructor(
         }
         stepViews.first().setActive(true)
         createBars()
+    }
+
+    private fun resetViews() {
+        removeAllViews()
+        stepViews.clear()
     }
 
     /**
@@ -163,7 +152,7 @@ open class StepProgressBarView @JvmOverloads constructor(
      * The next step, when we have views, is to create initial constraints for our view
      * It is the first view that user will see, so in our case it is first step
      */
-    private fun createInitialConstraints() = createConstraintSet().apply {
+    override fun createInitialConstraints() = createConstraintSet().apply {
         createConstrainsForAllSteps()
         setConstraintsForAllAnchors()
         setConstraintsForInactiveBar()
@@ -227,33 +216,10 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     /**
-     * The last step is to create transitions to let motion layout know how to transform our views
-     * Note that we have to set first transition to initialize first view's state
-     */
-    private fun createTransitions() {
-        createConstraintsForSteps()
-        val scene = MotionScene(this)
-        var firstTransition: MotionScene.Transition? = null
-
-        createConstraintsBetweenSteps().forEachIndexed { index, pair ->
-            val transition = scene.createTransition(pair)
-            scene.addTransition(transition)
-            if (index == 0) {
-                firstTransition = transition
-            }
-        }
-
-        setScene(scene)
-        setTransition(firstTransition!!)
-    }
-
-    /**
      * We need to create constraints for all steps
      * We don't need to recreate every constraint possible, only things that has to be changes across steps
      */
-    private fun createConstraintsForSteps() {
-        stepConstraints.addAll(stepViews.map { StepConstraintSet(generateViewId(), it.createConstraintsForStep()) })
-    }
+    override fun createConstraintsForSteps() = stepViews.map { StepConstraintSet(generateViewId(), it.createConstraintsForStep()) }
 
     /**
      * The only things that changes in our example is active bar
@@ -265,67 +231,22 @@ open class StepProgressBarView @JvmOverloads constructor(
     }
 
     /**
-     * We need to create transitions for every step
-     * We don't need every combination, but motion layout needs to know how to get to each step
-     * So we create transitions like: 1 to 2, 2 to 3, 3 to 4 etc.
-     */
-    private fun createConstraintsBetweenSteps(): MutableList<Pair<StepConstraintSet, StepConstraintSet>> {
-        val allContraints = mutableListOf<Pair<StepConstraintSet, StepConstraintSet>>()
-        stepConstraints.forEachIndexed { index, constraintsSet ->
-            // No next step for last one
-            if (index == stepViews.lastIndex) return@forEachIndexed
-            allContraints.add(constraintsSet to stepConstraints[index + 1])
-        }
-        return allContraints
-    }
-
-    /**
-     * To build the transition we need start and end constraint sets
-     * We don't need to create reversable constraints, motion layout works fine without that
-     */
-    private fun MotionScene.createTransition(sets: Pair<StepConstraintSet, StepConstraintSet>): MotionScene.Transition {
-        val startConstraintSet = sets.first
-        val endConstraintSet = sets.second
-        return TransitionBuilder.buildTransition(
-            this,
-            generateViewId(),
-            startConstraintSet.constraintSetId,
-            startConstraintSet.constraintSet,
-            endConstraintSet.constraintSetId,
-            endConstraintSet.constraintSet,
-        )
-    }
-
-    private fun resetViews() {
-        removeAllViews()
-        stepViews.clear()
-    }
-
-    /**
      * To set the active step we just need to use our custom imageView function to trigger it's own motion layout
-     * Then we can call transitionToState to let motion layout handle the transition
+     * The rest is already done in setStep function
      */
-    private fun setStep(step: Int) {
-        if (step == currentStep) return
-        val oldStepIndex = currentStep - 1
-        val newStepIndex = step - 1
-        stepViews[oldStepIndex].setActive(false)
-        stepViews[newStepIndex].setActive(true)
-        currentStep = step
-        transitionToState(stepConstraints[newStepIndex].constraintSetId, animationDuration)
+    override fun onStepChanged(oldIndex: Int, newIndex: Int) {
+        stepViews[oldIndex].setActive(false)
+        stepViews[newIndex].setActive(true)
     }
 
+    /**
+     * Note that this util is for simplicity, normally you should set dp from dimensions resources
+     */
     private fun Int.asDp() = context.dpToPx(this)
 
     private data class StepView(val imageViewId: Int, val anchorViewId: Int, private val activableImageView: ActivableImageView) {
         fun setActive(isActive: Boolean) = activableImageView.setActive(isActive)
     }
-    
-    private data class StepConstraintSet(val constraintSetId: Int, val constraintSet: ConstraintSet)
 
     data class Step(@DrawableRes val drawableRes: Int, @ColorRes val activeTint: Int, @ColorRes val inactiveTint: Int)
-
-    companion object {
-        private const val DEFAULT_ANIMATION_SPEED = 500
-    }
 }
