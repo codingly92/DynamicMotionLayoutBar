@@ -50,11 +50,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupActivableImageExample() = with(binding.contentActivableImageView) {
         buttonActivate.setOnClickListener {
-            imageViewProfile.setActive(true)
+            activableImageView.setActive(true)
         }
 
         buttonDeactivate.setOnClickListener {
-            imageViewProfile.setActive(false)
+            activableImageView.setActive(false)
         }
     }
 

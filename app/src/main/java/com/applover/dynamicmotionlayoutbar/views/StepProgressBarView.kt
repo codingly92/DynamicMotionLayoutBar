@@ -19,7 +19,7 @@ import com.applover.dynamicmotionlayoutbar.utils.createConstraintSet
 import com.applover.dynamicmotionlayoutbar.utils.dpToPx
 
 @Suppress("SpellCheckingInspection")
-open class StepProgressBarView @JvmOverloads constructor(
+class StepProgressBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
