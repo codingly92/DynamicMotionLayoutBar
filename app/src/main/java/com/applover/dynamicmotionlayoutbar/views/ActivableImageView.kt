@@ -52,6 +52,8 @@ class ActivableImageView @JvmOverloads constructor(
 
     /**
      * Initialize from xml and get attributes for colors of icons, animation duration and initial state
+     * Note that in normal application you shouldn't pass colors, but styles
+     * For the sake of simplicity, let's leave colors for now :)
      */
     init {
         attrs?.let {

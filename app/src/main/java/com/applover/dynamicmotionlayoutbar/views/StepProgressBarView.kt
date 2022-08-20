@@ -40,6 +40,8 @@ open class StepProgressBarView @JvmOverloads constructor(
 
     /**
      * Initialize from xml and get attributes for colors of bars and animation duration
+     * Note that in normal application you shouldn't pass colors, but styles
+     * For the sake of simplicity, let's leave colors for now :)
      */
     init {
         context.theme.obtainStyledAttributes(
