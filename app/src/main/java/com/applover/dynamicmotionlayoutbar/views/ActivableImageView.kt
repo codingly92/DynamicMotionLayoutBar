@@ -17,7 +17,7 @@ import com.applover.dynamicmotionlayoutbar.utils.centerInParent
 import com.applover.dynamicmotionlayoutbar.utils.createConstraintSet
 
 /**
- * Example view that animated tint change for imageView
+ * Example view that animates tint change for imageView
  */
 @Suppress("SpellCheckingInspection")
 class ActivableImageView @JvmOverloads constructor(
