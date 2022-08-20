@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <com.applover.dynamicmotionlayoutbar.views.ActivableImageView
-        android:id="@+id/imageViewProfile"
+        android:id="@+id/activableImageView"
         android:layout_width="96dp"
         android:layout_height="96dp"
         android:layout_margin="16dp"
@@ -27,7 +27,7 @@
         app:layout_constraintEnd_toStartOf="@+id/buttonDeactivate"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/activableImageView" />
 
     <Button
         android:id="@+id/buttonDeactivate"
@@ -38,5 +38,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/buttonActivate"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/activableImageView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
