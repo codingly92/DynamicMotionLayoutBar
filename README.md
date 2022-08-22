@@ -1,4 +1,4 @@
-# DynamicMotionLayoutBar
+# Dynamic MotionLayout bar
 Example of MotionLayout created programmatically
 
 # Before you start
