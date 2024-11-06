@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         setupActivableImageExample()
         setupXmlBasedStepProgressBarExample()
         setupStepProgressBarExample()
+        setupZoomExample()
     }
 
     private fun toggleExample(view: View) {
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         binding.contentActivableImageView.root.isVisible = example == Example.ActivableImageScreen
         binding.contentXmlBasedStepProgressBar.root.isVisible = example == Example.XmlBasedStepProgressBar
         binding.contentStepProgressBar.root.isVisible = example == Example.StepProgressBar
+        binding.contentZoom.root.isVisible = example == Example.Zoom
     }
 
     private fun setupActivableImageExample() = with(binding.contentActivableImageView) {
@@ -55,6 +57,13 @@ class MainActivity : AppCompatActivity() {
 
         buttonDeactivate.setOnClickListener {
             activableImageView.setActive(false)
+        }
+    }
+
+    private fun setupZoomExample(){
+        with(binding.contentZoom){
+            zoomContainer.initialize(listOf(1,2,3,4))
+            btnStop.setOnClickListener{ zoomContainer.stopTran()}
         }
     }
 
@@ -110,6 +119,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     enum class Example {
-        ActivableImageScreen, XmlBasedStepProgressBar, StepProgressBar,
+        ActivableImageScreen, XmlBasedStepProgressBar, StepProgressBar,Zoom
     }
 }
