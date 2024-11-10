@@ -2,9 +2,9 @@ package com.applover.dynamicmotionlayoutbar.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.motion.widget.MotionScene
@@ -21,20 +21,21 @@ class ZoomView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : MotionLayout(context, attrs, defStyleAttr) {
-    private val textviews = mutableListOf<TextView>()
-    private lateinit var indicator: View
-    private var selectViewId = 0
-    private lateinit var scene: MotionScene
+    private val mZoomIndicators = mutableListOf<RotateLayout>()
+    private lateinit var mSelectIndicator: RotateLayout
+    private var mSelectZoomIndicatorViewId = 0
+    private var mAngle = 0
+    private lateinit var mMotionScene: MotionScene
     /**
      * Initialize in the code as it is easier than passing list in xml file
      */
     fun initialize(zooms: List<Int>) {
         createViews(zooms)
-        selectViewId = textviews[0].id
-        createInitialConstraints()
-        scene = MotionScene(this)
-        setScene(scene)
-        val  transition = scene.createTransition(createConstraintSet() to createConstraintSet())
+        mSelectZoomIndicatorViewId = mZoomIndicators[0].id
+        getConstraints().applyTo(this)
+        mMotionScene = MotionScene(this)
+        setScene(mMotionScene)
+        val  transition = mMotionScene.createTransition(createConstraintSet() to createConstraintSet())
         setTransition(transition)
         setTransitionDuration(2000)
         transitionToEnd()
@@ -42,22 +43,34 @@ class ZoomView @JvmOverloads constructor(
 
     private fun resetViews() {
         removeAllViews()
-        textviews.clear()
+        mZoomIndicators.clear()
     }
 
     private fun createViews(zooms: List<Int>) {
         resetViews()
         zooms.forEach {
-            textviews.add(createZoomView(it))
+            mZoomIndicators.add(createZoomView(it))
         }
-        indicator = View(context)
-        indicator.id = generateViewId();
-        indicator.setBackgroundResource(R.drawable.indicator_background)
-        addView(indicator)
+
+        mSelectIndicator = RotateLayout(context)
+        mSelectIndicator.id = generateViewId();
+        val rotateLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        val selectorChild = View(context)
+        selectorChild.id = generateViewId();
+        selectorChild.setBackgroundResource(R.drawable.indicator_background)
+        val selectorChildLayoutParams = ViewGroup.LayoutParams(54.asDp(),32.asDp())
+        mSelectIndicator.addView(selectorChild,selectorChildLayoutParams)
+        addView(mSelectIndicator,rotateLayoutParams)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun createZoomView(zoom: Int): TextView {
+    private fun createZoomView(zoom: Int): RotateLayout {
+        val rotateLayout = RotateLayout(context)
+        val rotateId = generateViewId();
+        rotateLayout.id = rotateId;
+        val rotateLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        addView(rotateLayout, rotateLayoutParams)
+
         val text = TextView(context)
         val viewId = generateViewId()
         text.text = zoom.toString()
@@ -65,47 +78,52 @@ class ZoomView @JvmOverloads constructor(
         text.textSize = 8.asDp().toFloat()
         text.setTextColor(ContextCompat.getColor(context,R.color.white))
         text.textAlignment = TEXT_ALIGNMENT_CENTER;
-        val layoutParamsWrapMarginMedium = LayoutParams(54.asDp(), 32.asDp())
-        addView(text, layoutParamsWrapMarginMedium)
         text.setOnClickListener{
-            scene.definedTransitions.forEach { scene.removeTransition(it)}
-            val startSet = updateConstraints()
-            selectViewId=viewId
-            val endSet = updateConstraints()
-            val  transition = scene.createTransition(startSet to endSet)
+            mMotionScene.definedTransitions.forEach { mMotionScene.removeTransition(it)}
+            val startSet = getConstraints()
+            mSelectZoomIndicatorViewId=rotateId
+            val endSet = getConstraints()
+            val  transition = mMotionScene.createTransition(startSet to endSet)
             transition.duration = 200
             setTransition(transition)
             transitionToEnd()
         }
-        return text;
+        val textLayoutParams = ViewGroup.LayoutParams(54.asDp(),32.asDp())
+        rotateLayout.addView(text,textLayoutParams)
+        rotateLayout.angle = mAngle
+        return rotateLayout;
     }
 
-    fun createInitialConstraints() = createConstraintSet().apply {
-        val viewIds = textviews.map { it.id }.toIntArray()
+    fun getConstraints() = createConstraintSet().apply {
+        val viewIds = mZoomIndicators.map { it.id }.toIntArray()
         createHorizontalChain(ConstraintSet.PARENT_ID, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, viewIds, null, ConstraintSet.CHAIN_SPREAD)
         viewIds.forEach {
             connect(it, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             connect(it, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+            constrainWidth(it, if (mAngle % 180 == 0 ) 54.asDp() else 32.asDp())
+            constrainHeight(it, if (mAngle % 180 == 0 ) 32.asDp() else 54.asDp())
+            setIntValue(it,"Angle",mAngle)
         }
-        connect(indicator.id, ConstraintSet.END, selectViewId, ConstraintSet.END)
-        connect(indicator.id, ConstraintSet.START, selectViewId, ConstraintSet.START)
-        connect(indicator.id, ConstraintSet.TOP, selectViewId, ConstraintSet.TOP)
-        connect(indicator.id, ConstraintSet.BOTTOM, selectViewId, ConstraintSet.BOTTOM)
-        constrainWidth(indicator.id, ConstraintSet.MATCH_CONSTRAINT)
-        constrainHeight(indicator.id, ConstraintSet.MATCH_CONSTRAINT)
-        applyTo(this@ZoomView)
+        connect(mSelectIndicator.id, ConstraintSet.END, mSelectZoomIndicatorViewId, ConstraintSet.END)
+        connect(mSelectIndicator.id, ConstraintSet.START, mSelectZoomIndicatorViewId, ConstraintSet.START)
+        connect(mSelectIndicator.id, ConstraintSet.TOP, mSelectZoomIndicatorViewId, ConstraintSet.TOP)
+        connect(mSelectIndicator.id, ConstraintSet.BOTTOM, mSelectZoomIndicatorViewId, ConstraintSet.BOTTOM)
+        constrainWidth(mSelectIndicator.id, if (mAngle % 180 == 0 ) 54.asDp() else 32.asDp())
+        constrainHeight(mSelectIndicator.id, if (mAngle % 180 == 0 ) 32.asDp() else 54.asDp())
+        setIntValue(mSelectIndicator.id,"Angle",mAngle)
     }
 
-    fun updateConstraints(): ConstraintSet = createConstraintSet {
-        connect(indicator.id, ConstraintSet.END, selectViewId, ConstraintSet.END)
-        connect(indicator.id, ConstraintSet.START, selectViewId, ConstraintSet.START)
-        connect(indicator.id, ConstraintSet.TOP, selectViewId, ConstraintSet.TOP)
-        connect(indicator.id, ConstraintSet.BOTTOM, selectViewId, ConstraintSet.BOTTOM)
 
-    }
 
-    fun stopTran(){
-        scene.definedTransitions.forEach{scene.removeTransition(it)}
+    fun tranAngle(){
+        mMotionScene.definedTransitions.forEach { mMotionScene.removeTransition(it)}
+        val startSet = getConstraints()
+        mAngle = (mAngle + 90)
+        val endSet = getConstraints()
+        val  transition = mMotionScene.createTransition(startSet to endSet)
+        transition.duration = 2000
+        setTransition(transition)
+        transitionToEnd()
     }
 
 

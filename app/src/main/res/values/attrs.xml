@@ -18,4 +18,9 @@
         <attr name="active_tint" />
         <attr name="inactive_tint" />
     </declare-styleable>
+
+    <declare-styleable name="RotateLayout">
+        <!-- Child view of this layout will be rotated by this angle. -->
+        <attr name="angle" format="integer"/>
+    </declare-styleable>
 </resources>
