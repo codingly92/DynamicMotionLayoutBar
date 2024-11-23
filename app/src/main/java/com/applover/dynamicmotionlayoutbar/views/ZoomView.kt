@@ -21,8 +21,8 @@ class ZoomView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : MotionLayout(context, attrs, defStyleAttr) {
-    private val mZoomIndicators = mutableListOf<RotateLayout>()
-    private lateinit var mSelectIndicator: RotateLayout
+    private val mZoomIndicators = mutableListOf<RotateTextView>()
+    private lateinit var mSelectIndicator: RotateTextView
     private var mSelectZoomIndicatorViewId = 0
     private var mAngle = 0
     private lateinit var mMotionScene: MotionScene
@@ -51,27 +51,17 @@ class ZoomView @JvmOverloads constructor(
         zooms.forEach {
             mZoomIndicators.add(createZoomView(it))
         }
-
-        mSelectIndicator = RotateLayout(context)
+        mSelectIndicator = RotateTextView(context)
         mSelectIndicator.id = generateViewId();
         val rotateLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        val selectorChild = View(context)
-        selectorChild.id = generateViewId();
-        selectorChild.setBackgroundResource(R.drawable.indicator_background)
-        val selectorChildLayoutParams = ViewGroup.LayoutParams(54.asDp(),32.asDp())
-        mSelectIndicator.addView(selectorChild,selectorChildLayoutParams)
+        mSelectIndicator.setBackgroundResource(R.drawable.indicator_background)
+        mSelectIndicator.angle = mAngle
         addView(mSelectIndicator,rotateLayoutParams)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun createZoomView(zoom: Int): RotateLayout {
-        val rotateLayout = RotateLayout(context)
-        val rotateId = generateViewId();
-        rotateLayout.id = rotateId;
-        val rotateLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        addView(rotateLayout, rotateLayoutParams)
-
-        val text = TextView(context)
+    private fun createZoomView(zoom: Int): RotateTextView {
+        val text = RotateTextView(context)
         val viewId = generateViewId()
         text.text = zoom.toString()
         text.id = viewId;
@@ -81,17 +71,17 @@ class ZoomView @JvmOverloads constructor(
         text.setOnClickListener{
             mMotionScene.definedTransitions.forEach { mMotionScene.removeTransition(it)}
             val startSet = getConstraints()
-            mSelectZoomIndicatorViewId=rotateId
+            mSelectZoomIndicatorViewId=viewId
             val endSet = getConstraints()
             val  transition = mMotionScene.createTransition(startSet to endSet)
             transition.duration = 200
             setTransition(transition)
             transitionToEnd()
         }
-        val textLayoutParams = ViewGroup.LayoutParams(54.asDp(),32.asDp())
-        rotateLayout.addView(text,textLayoutParams)
-        rotateLayout.angle = mAngle
-        return rotateLayout;
+        val rotateLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        addView(text,rotateLayoutParams)
+        text.angle = mAngle
+        return text;
     }
 
     fun getConstraints() = createConstraintSet().apply {
@@ -100,16 +90,12 @@ class ZoomView @JvmOverloads constructor(
         viewIds.forEach {
             connect(it, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             connect(it, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-            constrainWidth(it, if (mAngle % 180 == 0 ) 54.asDp() else 32.asDp())
-            constrainHeight(it, if (mAngle % 180 == 0 ) 32.asDp() else 54.asDp())
             setIntValue(it,"Angle",mAngle)
         }
         connect(mSelectIndicator.id, ConstraintSet.END, mSelectZoomIndicatorViewId, ConstraintSet.END)
         connect(mSelectIndicator.id, ConstraintSet.START, mSelectZoomIndicatorViewId, ConstraintSet.START)
         connect(mSelectIndicator.id, ConstraintSet.TOP, mSelectZoomIndicatorViewId, ConstraintSet.TOP)
         connect(mSelectIndicator.id, ConstraintSet.BOTTOM, mSelectZoomIndicatorViewId, ConstraintSet.BOTTOM)
-        constrainWidth(mSelectIndicator.id, if (mAngle % 180 == 0 ) 54.asDp() else 32.asDp())
-        constrainHeight(mSelectIndicator.id, if (mAngle % 180 == 0 ) 32.asDp() else 54.asDp())
         setIntValue(mSelectIndicator.id,"Angle",mAngle)
     }
 
@@ -141,6 +127,6 @@ class ZoomView @JvmOverloads constructor(
             sets.first,
             generateViewId(),
             sets.second,
-        )
+        ).apply { layoutDuringTransition = MotionScene.LAYOUT_HONOR_REQUEST }
 
 }
